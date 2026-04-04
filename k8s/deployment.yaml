@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: python-app
+  labels:
+    app: python-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: python-app
+
+  template:
+    metadata:
+      labels:
+        app: python-app
+
+    spec:
+      containers:
+        - name: python-app
+          image: python-k8s-demo:v1
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 5000
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 2
+            periodSeconds: 5
