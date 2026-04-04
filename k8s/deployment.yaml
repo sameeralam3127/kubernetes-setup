@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: python-app
-          image: python-k8s-demo:v1
+          image: python-k8s-demo:v2
           imagePullPolicy: IfNotPresent
 
           ports:
@@ -37,14 +37,15 @@ spec:
 
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 5000
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 5
+            failureThreshold: 3
 
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 5000
             initialDelaySeconds: 2
-            periodSeconds: 5
+            periodSeconds: 3
