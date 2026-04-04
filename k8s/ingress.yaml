@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: fastapi-ingress
 spec:
+  ingressClassName: nginx
   rules:
-    - host: myapp.local
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix

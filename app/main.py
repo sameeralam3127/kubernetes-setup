@@ -29,3 +29,7 @@ def read_one(item_id: int, db: Session = Depends(get_db)):
 @app.delete("/items/{item_id}")
 def delete(item_id: int, db: Session = Depends(get_db)):
     return crud.delete_item(db, item_id)
+
+@app.on_event("startup")
+def startup():
+    models.Base.metadata.create_all(bind=engine)
