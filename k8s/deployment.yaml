@@ -22,7 +22,7 @@ spec:
       containers:
         - name: python-app
           image: python-k8s-demo:v1
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 5000
