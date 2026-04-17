@@ -9,7 +9,7 @@ MEMORY=4G
 DISK=20G
 IMAGE=22.04
 
-echo "🚀 Creating Kubernetes VMs using Multipass..."
+echo "Creating Kubernetes VMs using Multipass..."
 
 multipass launch "$IMAGE" \
   --name "$MASTER" \
@@ -25,5 +25,5 @@ for w in "${WORKERS[@]}"; do
     --disk "$DISK"
 done
 
-echo "✅ VMs created successfully"
+echo "VMs created successfully"
 multipass list

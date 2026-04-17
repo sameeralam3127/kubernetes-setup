@@ -8,6 +8,6 @@ if [[ -z "$JOIN_CMD" ]]; then
   exit 1
 fi
 
-echo "🔗 Joining node to Kubernetes cluster..."
+echo "Joining node to Kubernetes cluster..."
 sudo $JOIN_CMD
-echo "✅ Node successfully joined"
+echo "Node successfully joined"

@@ -15,13 +15,13 @@ for i in range(15):
         engine = create_engine(DATABASE_URL, pool_pre_ping=True)
         conn = engine.connect()
         conn.close()
-        print("✅ DB Connected")
+        print("DB connected")
         break
     except Exception as e:
-        print("❌ DB not ready, retrying...", e)
+        print("DB not ready, retrying...", e)
         time.sleep(2)
 
 if engine is None:
-    raise Exception("❌ Could not connect to DB")
+    raise Exception("Could not connect to DB")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

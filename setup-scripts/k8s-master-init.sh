@@ -3,7 +3,7 @@ set -euo pipefail
 
 MASTER_IP=$(hostname -I | awk '{print $1}')
 
-echo "🚀 Initializing Kubernetes master..."
+echo "Initializing Kubernetes control plane..."
 
 sudo kubeadm init \
   --apiserver-advertise-address="$MASTER_IP" \
@@ -13,10 +13,10 @@ mkdir -p "$HOME/.kube"
 sudo cp /etc/kubernetes/admin.conf "$HOME/.kube/config"
 sudo chown "$(id -u):$(id -g)" "$HOME/.kube/config"
 
-echo "🌐 Installing Calico CNI..."
+echo "Installing Calico CNI..."
 
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml
 
-echo "📌 Kubernetes master initialized"
-echo "👉 Run the join command on worker nodes:"
+echo "Kubernetes control plane initialized"
+echo "Run the join command on worker nodes:"
 kubeadm token create --print-join-command

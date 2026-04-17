@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "🔧 Configuring system prerequisites..."
+echo "Configuring system prerequisites..."
 
 sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
@@ -22,7 +22,7 @@ EOF
 
 sudo sysctl --system
 
-echo "📦 Installing containerd..."
+echo "Installing containerd..."
 
 sudo apt-get update -qq
 sudo apt-get install -y containerd
@@ -32,7 +32,7 @@ containerd config default | sudo tee /etc/containerd/config.toml
 sudo systemctl restart containerd
 sudo systemctl enable containerd
 
-echo "📦 Installing Kubernetes components..."
+echo "Installing Kubernetes components..."
 
 sudo apt-get install -y apt-transport-https ca-certificates curl
 
@@ -47,4 +47,4 @@ sudo apt-get update -qq
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
-echo "✅ Common Kubernetes setup complete"
+echo "Common Kubernetes setup complete"

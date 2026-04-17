@@ -126,7 +126,7 @@ Use this when you want to understand upstream Kubernetes bootstrapping in detail
 - applying CNI
 - joining worker nodes
 
-See the legacy scripts in [`Old/`](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/Old).
+See [../setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/setup-scripts/README.md) for the guided Multipass plus `kubeadm` workflow included in this repository.
 
 ## Podman on macOS
 
