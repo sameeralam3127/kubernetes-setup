@@ -34,16 +34,6 @@ If you already have Docker Desktop with Kubernetes enabled, start here:
 
 ## Repository Structure
 
-```text
-.
-├── README.md
-├── Dockerfile
-├── app/
-├── docs/
-├── k8s/
-└── setup-scripts/
-```
-
 - `app/`: sample FastAPI app
 - `docs/`: architecture, setup, and troubleshooting guides
 - `k8s/`: Kubernetes manifests for the sample app
@@ -136,7 +126,7 @@ multipass exec k3s-server -- sudo cat /etc/rancher/k3s/k3s.yaml
 
 ### Option 5: kubeadm on Multipass
 
-Use [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/setup-scripts/README.md) when you want hands-on practice with `kubeadm`, `containerd`, CNI setup, and worker node joining.
+Use [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts/README.md) when you want hands-on practice with `kubeadm`, `containerd`, CNI setup, and worker node joining.
 
 ## macOS Tooling Choices
 
@@ -192,35 +182,25 @@ Tradeoffs:
 
 ## Kubernetes Options Compared
 
-| Tool | What It Is | Best Use | Notes |
-| --- | --- | --- | --- |
-| Docker Desktop Kubernetes | Single-node Kubernetes bundled with Docker Desktop | fastest local start | easiest if already installed |
-| Kind | Kubernetes in Docker containers | testing and repeatable clusters | ideal for CI-like workflows |
-| Minikube | local Kubernetes runner with many drivers | learning and add-ons | very flexible |
-| K3s | lightweight Kubernetes distro | edge, homelab, lightweight labs | simpler and smaller than upstream Kubernetes |
-| kubeadm + Multipass | upstream-style cluster bootstrapping in VMs | deep learning | best for understanding cluster internals |
-| Rancher Desktop | desktop app bundling container runtime + K3s | Docker Desktop alternative | good GUI-driven option |
+| Tool                      | What It Is                                         | Best Use                        | Notes                                        |
+| ------------------------- | -------------------------------------------------- | ------------------------------- | -------------------------------------------- |
+| Docker Desktop Kubernetes | Single-node Kubernetes bundled with Docker Desktop | fastest local start             | easiest if already installed                 |
+| Kind                      | Kubernetes in Docker containers                    | testing and repeatable clusters | ideal for CI-like workflows                  |
+| Minikube                  | local Kubernetes runner with many drivers          | learning and add-ons            | very flexible                                |
+| K3s                       | lightweight Kubernetes distro                      | edge, homelab, lightweight labs | simpler and smaller than upstream Kubernetes |
+| kubeadm + Multipass       | upstream-style cluster bootstrapping in VMs        | deep learning                   | best for understanding cluster internals     |
+| Rancher Desktop           | desktop app bundling container runtime + K3s       | Docker Desktop alternative      | good GUI-driven option                       |
 
 ## Learn The Internals
 
 Read these next:
 
-- [docs/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/README.md)
-- [docs/macos-setup.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/macos-setup.md)
-- [docs/kubernetes-architecture.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/kubernetes-architecture.md)
-- [docs/container-runtime-stack.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/container-runtime-stack.md)
-- [docs/troubleshooting.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/troubleshooting.md)
-- [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/setup-scripts/README.md)
-
-## Audience-Friendly Navigation
-
-This reading order works well for first-time visitors:
-
-1. Start with this `README.md`.
-2. Use [docs/macos-setup.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/macos-setup.md) to choose a local platform.
-3. Read [docs/kubernetes-architecture.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/kubernetes-architecture.md) and [docs/container-runtime-stack.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/container-runtime-stack.md) to learn the internals.
-4. Use [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/setup-scripts/README.md) for the full Multipass plus kubeadm lab.
-5. Keep [docs/troubleshooting.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/troubleshooting.md) open when testing.
+- [docs/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/README.md)
+- [docs/macos-setup.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/macos-setup.md)
+- [docs/kubernetes-architecture.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/kubernetes-architecture.md)
+- [docs/container-runtime-stack.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/container-runtime-stack.md)
+- [docs/troubleshooting.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/troubleshooting.md)
+- [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts/README.md)
 
 ## Sample App Deployment Notes
 

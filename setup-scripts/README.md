@@ -22,18 +22,6 @@ This is the best folder for learners who want practical understanding of:
 
 If you want the fastest path to a working cluster, use one of the options in the root [README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/README.md) instead.
 
-## Folder Layout
-
-```text
-setup-scripts/
-├── README.md
-├── create-vms.sh
-├── k8s-common.sh
-├── k8s-master-init.sh
-├── k8s-worker-join.sh
-└── main.sh
-```
-
 File purpose:
 
 - `create-vms.sh`: creates one control plane VM and two worker VMs
