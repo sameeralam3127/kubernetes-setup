@@ -36,6 +36,16 @@ spec:
               value: postgres
           ports:
             - containerPort: 5432
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            periodSeconds: 20
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-storage
@@ -52,5 +62,6 @@ metadata:
 spec:
   selector:
     app: postgres
+  type: ClusterIP
   ports:
     - port: 5432

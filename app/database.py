@@ -1,15 +1,18 @@
+import os
+import time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import time
 
-DATABASE_URL = "postgresql://postgres:postgres@postgres:5432/appdb"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/appdb"
+)
 
 engine = None
 
 for i in range(15):
     try:
         print(f"Attempt {i+1}: Connecting to DB...")
-        engine = create_engine(DATABASE_URL)
+        engine = create_engine(DATABASE_URL, pool_pre_ping=True)
         conn = engine.connect()
         conn.close()
         print("✅ DB Connected")
