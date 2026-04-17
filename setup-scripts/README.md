@@ -20,7 +20,7 @@ This is the best folder for learners who want practical understanding of:
 - `kubeadm init` and `kubeadm join`
 - `containerd`, `kubelet`, and Kubernetes networking basics
 
-If you want the fastest path to a working cluster, use one of the options in the root [README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/README.md) instead.
+If you want the fastest path to a working cluster, use one of the options in the root [README.md](../README.md) instead.
 
 File purpose:
 

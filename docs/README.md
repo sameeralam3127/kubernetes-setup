@@ -4,11 +4,11 @@ This `docs/` folder is the main reading path for people who want to understand t
 
 ## Recommended Reading Order
 
-1. [macos-setup.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/macos-setup.md)
-2. [kubernetes-architecture.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/kubernetes-architecture.md)
-3. [container-runtime-stack.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/container-runtime-stack.md)
-4. [troubleshooting.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/docs/troubleshooting.md)
-5. [../setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/setup-scripts/README.md)
+1. [macos-setup.md](macos-setup.md)
+2. [kubernetes-architecture.md](kubernetes-architecture.md)
+3. [container-runtime-stack.md](container-runtime-stack.md)
+4. [troubleshooting.md](troubleshooting.md)
+5. [../setup-scripts/README.md](../setup-scripts/README.md)
 
 ## What Each Area Covers
 

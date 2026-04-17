@@ -126,7 +126,7 @@ multipass exec k3s-server -- sudo cat /etc/rancher/k3s/k3s.yaml
 
 ### Option 5: kubeadm on Multipass
 
-Use [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts/README.md) when you want hands-on practice with `kubeadm`, `containerd`, CNI setup, and worker node joining.
+Use [setup-scripts/README.md](setup-scripts/README.md) when you want hands-on practice with `kubeadm`, `containerd`, CNI setup, and worker node joining.
 
 ## macOS Tooling Choices
 
@@ -195,12 +195,12 @@ Tradeoffs:
 
 Read these next:
 
-- [docs/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/README.md)
-- [docs/macos-setup.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/macos-setup.md)
-- [docs/kubernetes-architecture.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/kubernetes-architecture.md)
-- [docs/container-runtime-stack.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/container-runtime-stack.md)
-- [docs/troubleshooting.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/docs/troubleshooting.md)
-- [setup-scripts/README.md](/Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts/README.md)
+- [docs/README.md](docs/README.md)
+- [docs/macos-setup.md](docs/macos-setup.md)
+- [docs/kubernetes-architecture.md](docs/kubernetes-architecture.md)
+- [docs/container-runtime-stack.md](docs/container-runtime-stack.md)
+- [docs/troubleshooting.md](docs/troubleshooting.md)
+- [setup-scripts/README.md](setup-scripts/README.md)
 
 ## Sample App Deployment Notes
 
