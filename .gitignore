@@ -7,3 +7,5 @@ venv/
 dist/
 build/
 *.egg-info/
+.vscode
+__pycache__
