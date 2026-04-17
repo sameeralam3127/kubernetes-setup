@@ -1,5 +1,0 @@
-{
-  "yaml.schemas": {
-    "kubernetes://schema/v1@service": "file:///Users/sameeralam/Documents/GitHub/kubernetes-multipass-setup/k8s/app.yaml"
-  }
-}
