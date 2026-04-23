@@ -1,36 +1,37 @@
 # kubeadm Cluster Setup on Multipass
 
-This folder contains the most hands-on setup path in the repository. It shows how to create a local Kubernetes cluster on Multipass using `kubeadm`, `containerd`, and Calico.
+This folder contains the manual `kubeadm` setup flow for a small local Kubernetes cluster on Multipass VMs.
 
-Use this path when you want to understand what happens below tools like Docker Desktop, Kind, Minikube, K3s, or Rancher Desktop.
-
-## What This Setup Creates
+The scripts are aligned with the Kubernetes `install-kubeadm` guidance for the `pkgs.k8s.io` package repository and use:
 
 - 1 control plane node
 - 2 worker nodes
 - `containerd` as the container runtime
 - Calico as the CNI plugin
 
-## Why This Folder Matters
+## Files
 
-This is the best folder for learners who want practical understanding of:
+- `create-vms.sh`: creates the Multipass VMs
+- `k8s-common.sh`: installs and configures the required Kubernetes components on every node
+- `k8s-master-init.sh`: initializes the control plane and applies Calico
+- `k8s-worker-join.sh`: joins a worker node using the `kubeadm join` command from the control plane
 
-- control plane versus worker responsibilities
-- node preparation and Linux prerequisites
-- `kubeadm init` and `kubeadm join`
-- `containerd`, `kubelet`, and Kubernetes networking basics
+## Prerequisites
 
-If you want the fastest path to a working cluster, use one of the options in the root [README.md](../README.md) instead.
+Install these on your macOS host before you begin:
 
-File purpose:
+- Multipass
+- Bash or a compatible shell
+- internet access for package and image downloads
+- `kubectl` on your host if you want to inspect the cluster from macOS
 
-- `create-vms.sh`: creates one control plane VM and two worker VMs
-- `k8s-common.sh`: installs Kubernetes prerequisites on every node
-- `k8s-master-init.sh`: initializes the control plane and installs Calico
-- `k8s-worker-join.sh`: joins a worker node to the cluster
-- `main.sh`: optional Ubuntu package bootstrap helper
+Verify Multipass:
 
-## Architecture Overview
+```bash
+multipass version
+```
+
+## Architecture
 
 ```text
 Host Machine
@@ -47,35 +48,12 @@ Host Machine
     `-- kubelet + kube-proxy
 ```
 
-## Prerequisites
-
-Install these on your macOS host:
-
-- Multipass
-- Bash or a compatible shell
-- `kubectl` on your host if you want to inspect the cluster locally
-- internet access for package and image downloads
-
-Verify Multipass:
+## Step 1: Create the VMs
 
 ```bash
-multipass version
-```
-
-## Workflow
-
-### Step 1: Create Virtual Machines
-
-```bash
-cd setup-scripts
+cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
 ./create-vms.sh
 ```
-
-This creates:
-
-- `k8s-master`
-- `k8s-worker-1`
-- `k8s-worker-2`
 
 Verify:
 
@@ -83,32 +61,46 @@ Verify:
 multipass list
 ```
 
-### Step 2: Install Kubernetes Prerequisites On Every Node
+## Step 2: Install Kubernetes Components on Every Node
 
-Run the common setup script on the control plane and each worker:
+Copy the shared install script to the control plane and both workers:
 
 ```bash
-cd setup-scripts
-multipass transfer k8s-common.sh k8s-master:/home/ubuntu/k8s-common.sh
-multipass transfer k8s-common.sh k8s-worker-1:/home/ubuntu/k8s-common.sh
-multipass transfer k8s-common.sh k8s-worker-2:/home/ubuntu/k8s-common.sh
+cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
 
-multipass exec k8s-master -- bash /home/ubuntu/k8s-common.sh
-multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-common.sh
-multipass exec k8s-worker-2 -- bash /home/ubuntu/k8s-common.sh
+for node in k8s-master k8s-worker-1 k8s-worker-2; do
+  multipass transfer k8s-common.sh "${node}:/home/ubuntu/k8s-common.sh"
+done
 ```
 
-This script:
-
-- disables swap
-- configures kernel networking parameters
-- installs `containerd`
-- installs `kubelet`, `kubeadm`, and `kubectl`
-
-### Step 3: Initialize The Control Plane
+Run it on each node:
 
 ```bash
-cd setup-scripts
+for node in k8s-master k8s-worker-1 k8s-worker-2; do
+  multipass exec "${node}" -- bash /home/ubuntu/k8s-common.sh
+done
+```
+
+What `k8s-common.sh` does:
+
+- disables swap and comments swap entries in `/etc/fstab`
+- enables the required kernel modules and networking sysctls
+- installs and configures `containerd`
+- sets `SystemdCgroup = true` in the `containerd` config
+- installs `kubelet`, `kubeadm`, and `kubectl` from the Kubernetes `v1.35` package repository
+
+If you want a different Kubernetes minor version, set `KUBERNETES_VERSION` when running the script:
+
+```bash
+multipass exec k8s-master -- env KUBERNETES_VERSION=v1.34 bash /home/ubuntu/k8s-common.sh
+```
+
+## Step 3: Initialize the Control Plane
+
+Copy and run the control-plane script:
+
+```bash
+cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
 multipass transfer k8s-master-init.sh k8s-master:/home/ubuntu/k8s-master-init.sh
 multipass exec k8s-master -- bash /home/ubuntu/k8s-master-init.sh
 ```
@@ -116,51 +108,60 @@ multipass exec k8s-master -- bash /home/ubuntu/k8s-master-init.sh
 This step:
 
 - runs `kubeadm init`
-- configures `kubectl`
+- points Kubernetes to the `containerd` CRI socket
+- configures `kubectl` for the `ubuntu` user
 - installs Calico
-- prints the worker join command
+- prints the join command for worker nodes
 
-Save the join command because you will use it in the next step.
-
-### Step 4: Join The Worker Nodes
-
-Copy the worker join script and run it with the join command produced in step 3:
+Optional overrides:
 
 ```bash
-cd setup-scripts
+multipass exec k8s-master -- env POD_NETWORK_CIDR=192.168.0.0/16 bash /home/ubuntu/k8s-master-init.sh
+```
+
+Save the `kubeadm join ...` command printed at the end.
+
+## Step 4: Join the Worker Nodes
+
+Copy the worker join helper:
+
+```bash
+cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
 multipass transfer k8s-worker-join.sh k8s-worker-1:/home/ubuntu/k8s-worker-join.sh
 multipass transfer k8s-worker-join.sh k8s-worker-2:/home/ubuntu/k8s-worker-join.sh
-
-multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-worker-join.sh "<JOIN_COMMAND>"
-multipass exec k8s-worker-2 -- bash /home/ubuntu/k8s-worker-join.sh "<JOIN_COMMAND>"
 ```
 
-Example join command:
+Run the join command on each worker:
 
 ```bash
-kubeadm join 10.0.0.10:6443 \
-  --token abcdef.123456 \
-  --discovery-token-ca-cert-hash sha256:xxxxxxxx
+multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-worker-join.sh "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
+multipass exec k8s-worker-2 -- bash /home/ubuntu/k8s-worker-join.sh "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
 ```
 
-### Step 5: Verify The Cluster
-
-Run from the master node:
+Example:
 
 ```bash
-multipass exec k8s-master -- kubectl get nodes
+multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-worker-join.sh "kubeadm join 10.0.0.10:6443 --token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:xxxxxxxx"
 ```
 
-Expected result:
+## Step 5: Verify the Cluster
+
+Check node status from the control plane:
+
+```bash
+multipass exec k8s-master -- kubectl get nodes -o wide
+```
+
+Expected shape:
 
 ```text
 NAME           STATUS   ROLES           AGE   VERSION
-k8s-master     Ready    control-plane   2m    v1.29.x
-k8s-worker-1   Ready    <none>          1m    v1.29.x
-k8s-worker-2   Ready    <none>          1m    v1.29.x
+k8s-master     Ready    control-plane   2m    v1.35.x
+k8s-worker-1   Ready    <none>          1m    v1.35.x
+k8s-worker-2   Ready    <none>          1m    v1.35.x
 ```
 
-## Optional Test Workload
+## Optional Smoke Test
 
 ```bash
 multipass exec k8s-master -- kubectl create deployment nginx --image=nginx
@@ -178,5 +179,5 @@ multipass purge
 ## Notes
 
 - This setup is intended for learning, testing, and development.
-- It is not intended as a production cluster deployment pattern.
-- It works especially well when you want to understand Kubernetes components in a more realistic Linux environment.
+- It is not a production cluster deployment pattern.
+- The Kubernetes docs recommend installing a supported container runtime before using `kubeadm`; these scripts use `containerd`.
