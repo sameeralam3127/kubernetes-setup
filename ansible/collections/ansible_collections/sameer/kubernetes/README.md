@@ -1,80 +1,20 @@
-# Sameer Kubernetes Collection
+# sameer.kubernetes Collection
 
-This repository contains the `sameer.kubernetes` Ansible Collection.
+This local collection contains the Kubernetes roles used by the Ansible kubeadm playbook in this repository.
 
-## Tested with Ansible
+## Included Roles
 
-Tested with ansible-core >=2.14 releases and the current development version of
-ansible-core.
+- `sameer.kubernetes.kubeadm_common`
+- `sameer.kubernetes.kubeadm_control_plane`
+- `sameer.kubernetes.kubeadm_worker_join`
 
-## External requirements
+## Usage
 
-Some modules and plugins require external libraries. Please check the
-requirements for each plugin or module you use in the documentation to find out
-which requirements are needed.
-
-## Included content
-
-Please check the included content on the
-[Ansible Galaxy page for this collection](https://galaxy.ansible.com/sameer/kubernetes).
-
-## Using this collection
-
-```shell
-    ansible-galaxy collection install sameer.kubernetes
-```
-
-You can also include it in a `requirements.yml` file and install it via
-`ansible-galaxy collection install -r requirements.yml` using the format:
-
-```yaml
-collections:
-  - name: sameer.kubernetes
-```
-
-To upgrade the collection to the latest available version, run the following
-command:
+Run the playbook from the project root:
 
 ```bash
-ansible-galaxy collection install sameer.kubernetes --upgrade
+cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/ansible
+ansible-playbook kubeadm-cluster.yml -K
 ```
 
-You can also install a specific version of the collection, for example, if you
-need to downgrade when something is broken in the latest version (please report
-an issue in this repository). Use the following syntax where `X.Y.Z` can be any
-[available version](https://galaxy.ansible.com/sameer/kubernetes):
-
-```bash
-ansible-galaxy collection install sameer.kubernetes:==X.Y.Z
-```
-
-See
-[Ansible Using Collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html)
-for more details.
-
-## Release notes
-
-See the
-[changelog](https://github.com/ansible-collections/sameer.kubernetes/tree/main/CHANGELOG.rst).
-
-## Roadmap
-
-<!-- Optional. Include the roadmap for this collection, and the proposed release/versioning strategy so users can anticipate the upgrade/update cycle. -->
-
-## More information
-
-<!-- List out where the user can find additional information, such as working group meeting times, slack/Matrix channels, or documentation for the product this collection automates. At a minimum, link to: -->
-
-- [Ansible collection development forum](https://forum.ansible.com/c/project/collection-development/27)
-- [Ansible User guide](https://docs.ansible.com/ansible/devel/user_guide/index.html)
-- [Ansible Developer guide](https://docs.ansible.com/ansible/devel/dev_guide/index.html)
-- [Ansible Collections Checklist](https://docs.ansible.com/ansible/devel/community/collection_contributors/collection_requirements.html)
-- [Ansible Community code of conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html)
-- [The Bullhorn (the Ansible Contributor newsletter)](https://docs.ansible.com/ansible/devel/community/communication.html#the-bullhorn)
-- [News for Maintainers](https://forum.ansible.com/tag/news-for-maintainers)
-
-## Licensing
-
-GNU General Public License v3.0 or later.
-
-See [LICENSE](https://www.gnu.org/licenses/gpl-3.0.txt) to see the full text.
+Edit `inventory/hosts.yml` before running the playbook so it matches your control-plane and worker nodes.

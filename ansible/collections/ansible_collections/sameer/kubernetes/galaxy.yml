@@ -1,15 +1,11 @@
 ---
-# Minimal galaxy.yml for a playbook project for tools to recognize this as a collection
-
 namespace: "sameer"
 name: "kubernetes"
 readme: README.md
 version: 0.0.1
 authors:
-  - your name <example@domain.com>
+  - Sameer Alam
 
-description: Collection for sameer.kubernetes playbook project
-
-# TO-DO: update the tags based on your content type
-tags: ["tools"]
-repository: NA
+description: Local Ansible collection for kubeadm-based Kubernetes cluster setup
+tags: ["kubernetes", "kubeadm", "containerd"]
+repository: https://github.com/sameeralam/kubernetes-setup
