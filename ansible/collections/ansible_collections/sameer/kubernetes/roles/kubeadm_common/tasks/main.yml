@@ -1,0 +1,126 @@
+---
+- name: Disable swap immediately
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb | int > 0
+  changed_when: ansible_swaptotal_mb | int > 0
+
+- name: Disable swap in fstab
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*\sswap\s+.*)$'
+    replace: '# \1'
+
+- name: Ensure kernel modules file is present
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/k8s.conf
+    mode: "0644"
+    content: |
+      {% for module in kubernetes_kernel_modules %}
+      {{ module }}
+      {% endfor %}
+
+- name: Load required kernel modules
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ kubernetes_kernel_modules }}"
+
+- name: Configure Kubernetes sysctl settings
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_file: /etc/sysctl.d/k8s.conf
+    reload: true
+  loop: "{{ kubernetes_sysctl_settings | dict2items }}"
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name: "{{ kubernetes_common_packages }}"
+    state: present
+    update_cache: true
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download Kubernetes package repository key
+  ansible.builtin.get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key"
+    dest: /tmp/kubernetes-release.key
+    mode: "0644"
+
+- name: Convert Kubernetes package repository key to gpg keyring
+  ansible.builtin.command:
+    cmd: "gpg --dearmor -o {{ kubernetes_keyring_path }} /tmp/kubernetes-release.key"
+  args:
+    creates: "{{ kubernetes_keyring_path }}"
+
+- name: Configure Kubernetes apt repository
+  ansible.builtin.apt_repository:
+    repo: "{{ kubernetes_apt_repo }}"
+    filename: kubernetes
+    state: present
+    update_cache: true
+
+- name: Install Kubernetes packages
+  ansible.builtin.apt:
+    name: "{{ kubernetes_packages }}"
+    state: present
+
+- name: Hold Kubernetes and containerd packages
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ kubernetes_packages + ['containerd'] }}"
+
+- name: Ensure containerd configuration directory exists
+  ansible.builtin.file:
+    path: /etc/containerd
+    state: directory
+    mode: "0755"
+
+- name: Check whether containerd configuration already exists
+  ansible.builtin.stat:
+    path: "{{ containerd_config_path }}"
+  register: containerd_config_stat
+
+- name: Create default containerd configuration when missing
+  ansible.builtin.command:
+    cmd: "containerd config default"
+  register: containerd_default_config
+  changed_when: false
+  when: not containerd_config_stat.stat.exists
+
+- name: Write containerd configuration
+  ansible.builtin.copy:
+    dest: "{{ containerd_config_path }}"
+    mode: "0644"
+    content: "{{ containerd_default_config.stdout }}"
+  when: not containerd_config_stat.stat.exists
+  notify: Restart containerd
+
+- name: Set containerd to use the systemd cgroup driver
+  ansible.builtin.replace:
+    path: "{{ containerd_config_path }}"
+    regexp: 'SystemdCgroup = false'
+    replace: 'SystemdCgroup = true'
+  notify: Restart containerd
+
+- name: Ensure containerd is enabled and running
+  ansible.builtin.service:
+    name: containerd
+    state: started
+    enabled: true
+
+- name: Ensure kubelet is enabled
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true
+
+- name: Remove temporary Kubernetes repository key
+  ansible.builtin.file:
+    path: /tmp/kubernetes-release.key
+    state: absent
