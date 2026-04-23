@@ -12,6 +12,7 @@ The scripts are aligned with the Kubernetes `install-kubeadm` guidance for the `
 ## Files
 
 - `create-vms.sh`: creates the Multipass VMs
+- `k8s-node-setup.sh`: single entrypoint that can install prerequisites, initialize the control plane, or join a worker
 - `k8s-common.sh`: installs and configures the required Kubernetes components on every node
 - `k8s-master-init.sh`: initializes the control plane and applies Calico
 - `k8s-worker-join.sh`: joins a worker node using the `kubeadm join` command from the control plane
@@ -61,6 +62,42 @@ Verify:
 multipass list
 ```
 
+## Recommended: Use the Single Setup Script
+
+Copy the full setup folder or at least these files to each Ubuntu node:
+
+- `k8s-node-setup.sh`
+- `k8s-common.sh`
+- `k8s-master-init.sh`
+- `k8s-worker-join.sh`
+
+Then run the wrapper script:
+
+```bash
+bash /home/ubuntu/k8s-node-setup.sh
+```
+
+It will ask whether you want to:
+
+- install node prerequisites only
+- configure the node as the control plane
+- join the node as a worker
+- run install plus control-plane setup in one go
+- run install plus worker join in one go
+
+Examples:
+
+```bash
+bash /home/ubuntu/k8s-node-setup.sh all-control-plane
+bash /home/ubuntu/k8s-node-setup.sh all-worker "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
+```
+
+If the node is already prepared and you only want to join it later:
+
+```bash
+bash /home/ubuntu/k8s-node-setup.sh worker-join "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
+```
+
 ## Step 2: Install Kubernetes Components on Every Node
 
 Copy the shared install script to the control plane and both workers:
@@ -70,6 +107,9 @@ cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
 
 for node in k8s-master k8s-worker-1 k8s-worker-2; do
   multipass transfer k8s-common.sh "${node}:/home/ubuntu/k8s-common.sh"
+  multipass transfer k8s-master-init.sh "${node}:/home/ubuntu/k8s-master-init.sh"
+  multipass transfer k8s-worker-join.sh "${node}:/home/ubuntu/k8s-worker-join.sh"
+  multipass transfer k8s-node-setup.sh "${node}:/home/ubuntu/k8s-node-setup.sh"
 done
 ```
 
@@ -77,7 +117,7 @@ Run it on each node:
 
 ```bash
 for node in k8s-master k8s-worker-1 k8s-worker-2; do
-  multipass exec "${node}" -- bash /home/ubuntu/k8s-common.sh
+  multipass exec "${node}" -- bash /home/ubuntu/k8s-node-setup.sh common
 done
 ```
 
@@ -101,8 +141,7 @@ Copy and run the control-plane script:
 
 ```bash
 cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
-multipass transfer k8s-master-init.sh k8s-master:/home/ubuntu/k8s-master-init.sh
-multipass exec k8s-master -- bash /home/ubuntu/k8s-master-init.sh
+multipass exec k8s-master -- bash /home/ubuntu/k8s-node-setup.sh control-plane
 ```
 
 This step:
@@ -126,22 +165,14 @@ Save the `kubeadm join ...` command printed at the end.
 Copy the worker join helper:
 
 ```bash
-cd /Users/sameeralam/Documents/GitHub/kubernetes-setup/setup-scripts
-multipass transfer k8s-worker-join.sh k8s-worker-1:/home/ubuntu/k8s-worker-join.sh
-multipass transfer k8s-worker-join.sh k8s-worker-2:/home/ubuntu/k8s-worker-join.sh
-```
-
-Run the join command on each worker:
-
-```bash
-multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-worker-join.sh "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
-multipass exec k8s-worker-2 -- bash /home/ubuntu/k8s-worker-join.sh "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
+multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-node-setup.sh worker-join "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
+multipass exec k8s-worker-2 -- bash /home/ubuntu/k8s-node-setup.sh worker-join "kubeadm join <control-plane-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
 ```
 
 Example:
 
 ```bash
-multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-worker-join.sh "kubeadm join 10.0.0.10:6443 --token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:xxxxxxxx"
+multipass exec k8s-worker-1 -- bash /home/ubuntu/k8s-node-setup.sh worker-join "kubeadm join 10.0.0.10:6443 --token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:xxxxxxxx"
 ```
 
 ## Step 5: Verify the Cluster
